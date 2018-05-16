@@ -1,0 +1,2 @@
+# AircraftWar
+这是一个依赖pygame模块开发的简单飞机大战游戏
