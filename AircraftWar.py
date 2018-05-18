@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-
+import random
 import pygame
 from pygame.locals import *
 import time
@@ -21,6 +21,21 @@ class BasePlane:
             if bullet.judge():
                 self.bullets.remove(bullet)
 
+class BaseBullet:
+    def __init__(self, screen_tmp, x, y, image_name):
+        self.x = x
+        self.y = y
+        self.screen = screen_tmp
+        self.image = pygame.image.load(image_name)
+
+    def display(self):
+        self.screen.blit(self.image, (self.x, self.y))
+
+    def move(self):
+        self.y -= 0
+
+    def judge(self):
+        return True
 
 class HeroPlane(BasePlane):
     def __init__(self, screen_tmp):
@@ -61,13 +76,14 @@ class EnemyPlane(BasePlane):
                 self.x -= 2
             else:
                 self.direction = "right"
+    def fire(self):
+        random_num = random.randint(1,200)
+        if random_num == 8 or random_num == 100:
+            self.bullets.append(EnemyBullet(self.screen, self.x, self.y))
 
-class Bullet:
+class Bullet(BaseBullet):
     def __init__(self, screen_tmp, x, y):
-        self.x = x
-        self.y = y
-        self.screen = screen_tmp
-        self.image = pygame.image.load("./picture/bullet.png")
+        super().__init__(screen_tmp, x, y, "./picture/bullet.png")
 
     def display(self):
         self.screen.blit(self.image, (self.x, self.y))
@@ -81,6 +97,21 @@ class Bullet:
         else:
             return False
 
+class EnemyBullet(BaseBullet):
+    def __init__(self, screen_tmp, x, y):
+        super().__init__(screen_tmp, x + 18, y + 25, "./picture/bullet1.png")
+
+    def display(self):
+        self.screen.blit(self.image, (self.x, self.y))
+
+    def move(self):
+        self.y += 3
+
+    def judge(self):
+        if self.y > 750:
+            return True
+        else:
+            return False
 
 def key_control(hero_tmp):
     # 获取事件，比如按键等
@@ -105,6 +136,7 @@ def key_control(hero_tmp):
                 print('space')
                 hero_tmp.fire()
 
+
 def main():
     # 1. 创建窗口
     screen = pygame.display.set_mode((480, 780), 0, 32)
@@ -122,6 +154,7 @@ def main():
         screen.blit(background, (0, 0))
         hero.display()
         enemy.display()
+        enemy.fire()
         pygame.display.update()
         key_control(hero)
         time.sleep(0.01)
